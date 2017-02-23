@@ -1,0 +1,107 @@
+@startuml
+
+abstract class MvpActivity{
+    +getMvpDelegate();
+}
+abstract class MvpLceActivity{
+}
+interface CountriesActivity{
+}
+
+interface MvpView
+interface MvpLceView{
+  + void showLoading(boolean pullToRefresh);
+  + void showContent();
+  + void showError(Throwable e, boolean pullToRefresh);
+  + void setData(M data);
+  + void loadData(boolean pullToRefresh);
+}
+interface CountriesView{
+     +showLoading(boolean pullToRefresh);
+     + showContent();
+     + showError(Throwable e, boolean pullToRefresh);
+     + setData(M data);
+     + loadData(boolean pullToRefresh);
+}
+
+interface ActivityMvpDelegateCallback{
+}
+interface ActivityMvpDelegate{
+        + void onCreate(Bundle bundle);
+      + void onDestroy();
+      + void onPause();
+      + void onResume();
+      + void onStart();
+      + void onStop();
+      + void onRestart();
+      + void onContentChanged();
+      + void onSaveInstanceState(Bundle outState);
+      + void onPostCreate(Bundle savedInstanceState);
+      + Object onRetainCustomNonConfigurationInstance();
+      + Object getNonMosbyLastCustomNonConfigurationInstance();
+}
+class ActivityMvpDelegateImpl{
+    MvpInternalDelegate internalDelegate;
+    MvpDelegateCallback mvpDelegateCallback;
+    onCreate(Bundle bundle);// 创建Presenter
+}
+
+class MvpInternalDelegate{
+
+}
+interface MvpDelegateCallback{
+    + P createPresenter();
+    + P getPresenter();
+    + void setPresenter(P presenter);
+    + V getMvpView();
+    + boolean isRetainInstance();
+    + void setRetainInstance(boolean retainingInstance);
+    + boolean shouldInstanceBeRetained();
+}
+
+
+MvpInternalDelegate *-- MvpDelegateCallback
+ActivityMvpDelegateImpl *-- ActivityMvpDelegateCallback
+ActivityMvpDelegateImpl *-- MvpInternalDelegate
+ActivityMvpDelegate <|.. ActivityMvpDelegateImpl
+
+
+MvpActivity<|--MvpLceActivity
+
+MvpLceActivity<|--CountriesActivity
+CountriesView<|..CountriesActivity
+
+MvpView  <|-- MvpLceView
+MvpLceView  <|-- CountriesView
+
+MvpView<|--MvpActivity
+MvpLceView<|..MvpLceActivity
+ActivityMvpDelegateCallback<|..MvpActivity
+MvpDelegateCallback<|-ActivityMvpDelegateCallback
+MvpActivity -- ActivityMvpDelegate
+
+
+interface MvpPresenter{
+}
+class MvpBasePresenter{
+
+}
+MvpPresenter<|--MvpBasePresenter
+interface CountriesPresenter{
++ void loadCountries(final boolean pullToRefresh);
+}
+
+interface MvpPresenter{
+  + void attachView(V view);
+  + void detachView(boolean retainInstance);
+}
+MvpActivity*--MvpPresenter
+MvpPresenter <|. CountriesPresenter
+MvpDelegateCallback *-MvpPresenter
+CountriesActivity*--CountriesPresenter
+
+class SimpleCountriesPresenter{
+}
+CountriesPresenter<|..SimpleCountriesPresenter
+MvpBasePresenter<|--SimpleCountriesPresenter
+@enduml
